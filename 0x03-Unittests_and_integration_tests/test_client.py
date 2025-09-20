@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for client.py"""
+"""test_client.py - Unit tests for client.py"""
 
 import unittest
 from unittest.mock import patch, PropertyMock
@@ -9,7 +9,7 @@ from fixtures import org_payload, repos_payload, expected_repos
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """Test cases for the GithubOrgClient class"""
+    """Unit tests for the GithubOrgClient class."""
 
     @parameterized.expand([
         ("google",),
@@ -17,7 +17,12 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that org returns the correct value"""
+        """Test that GithubOrgClient.org returns expected organization data.
+
+        Args:
+            org_name (str): The name of the GitHub organization.
+            mock_get_json (Mock): Mocked version of get_json.
+        """
         mock_get_json.return_value = {"login": org_name}
         client = GithubOrgClient(org_name)
         result = client.org
@@ -27,7 +32,7 @@ class TestGithubOrgClient(unittest.TestCase):
         )
 
     def test_public_repos_url(self):
-        """Test that _public_repos_url returns repos_url"""
+        """Test that _public_repos_url returns the correct repos_url."""
         with patch(
             "client.GithubOrgClient.org",
             new_callable=PropertyMock
@@ -41,7 +46,11 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
-        """Test that public_repos returns list of repos"""
+        """Test that public_repos returns the expected list of repos.
+
+        Args:
+            mock_get_json (Mock): Mocked version of get_json.
+        """
         mock_get_json.return_value = repos_payload
         with patch(
             "client.GithubOrgClient._public_repos_url",
@@ -62,7 +71,13 @@ class TestGithubOrgClient(unittest.TestCase):
         ({"license": {"key": "other_license"}}, "my_license", False),
     ])
     def test_has_license(self, repo, license_key, expected):
-        """Test that has_license returns True only for matching license"""
+        """Test that has_license correctly validates repo licenses.
+
+        Args:
+            repo (Dict): Repository dictionary to test.
+            license_key (str): The license key to check for.
+            expected (bool): The expected result of the check.
+        """
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
 
