@@ -38,7 +38,7 @@ class TestGetJson(unittest.TestCase):
     ])
     @patch("utils.requests.get")
     def test_get_json(self, test_url, test_payload, mock_get):
-        """Test that get_json returns expected result with mocked requests.get"""
+        """Test get_json returns expected result with mocked requests.get"""
         mock_get.return_value.json.return_value = test_payload
 
         result = get_json(test_url)
@@ -60,7 +60,11 @@ class TestMemoize(unittest.TestCase):
             def a_property(self):
                 return self.a_method()
 
-        with patch.object(TestClass, "a_method", return_value=42) as mock_method:
+        with patch.object(
+            TestClass,
+            "a_method",
+            return_value=42
+        ) as mock_method:
             obj = TestClass()
             # First call should use a_method
             self.assertEqual(obj.a_property, 42)
