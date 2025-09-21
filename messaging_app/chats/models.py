@@ -35,6 +35,7 @@ class Message(models.Model):
     sender = models.ForeignKey(User, related_name="messages_sent", on_delete=models.CASCADE)
     message_body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Message {self.message_id} by {self.sender}"
