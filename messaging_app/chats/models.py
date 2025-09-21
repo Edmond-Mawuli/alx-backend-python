@@ -5,6 +5,9 @@ import uuid
 
 # Custom User model
 class User(AbstractUser):
+    user_id = models.AutoField(primary_key=True)  # This replaces the default `id`
+    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
+
     user_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Django hashes this internally
