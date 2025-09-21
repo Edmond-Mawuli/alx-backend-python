@@ -1,26 +1,37 @@
-import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import uuid
 
+
+# Custom User model
 class User(AbstractUser):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    role = models.CharField(
-        max_length=10,
-        choices=[('guest', 'Guest'), ('host', 'Host'), ('admin', 'Admin')],
-        default='guest'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
+    user_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)  # Django hashes this internally
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
+
+
+# Conversation model
 class Conversation(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    conversation_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     participants = models.ManyToManyField(User, related_name="conversations")
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Message(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages")
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
-    body = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Conversation {self.conversation_id}"
 
+
+# Message model
+class Message(models.Model):
+    message_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    conversation = models.ForeignKey(Conversation, related_name="messages", on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name="messages_sent", on_delete=models.CASCADE)
+    message_body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message {self.message_id} by {self.sender}"
